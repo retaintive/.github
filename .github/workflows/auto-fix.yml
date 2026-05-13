@@ -1,8 +1,5 @@
 # Reusable workflow: post @claude comment on PRs with CI failures.
 #
-# Caller repos add a 10-line workflow file that triggers this on workflow_run.
-# See workflow-templates/auto-fix-caller.yml for the copy-paste template.
-#
 # Loop prevention:
 # - Skip if commit author or triggering_actor contains "claude"
 # - Skip if @claude comment already exists (configurable max_attempts)
@@ -41,25 +38,36 @@ on:
         type: number
         default: 1
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   post-claude-comment:
     if: inputs.run_conclusion == 'failure' || inputs.run_conclusion == 'timed_out'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
+        env:
+          PR_NUMBERS: ${{ inputs.pr_numbers }}
+          COMMIT_AUTHOR: ${{ inputs.commit_author }}
+          TRIGGERING_ACTOR: ${{ inputs.triggering_actor }}
+          MAX_ATTEMPTS: ${{ inputs.max_attempts }}
+          WF_NAME: ${{ inputs.run_name }}
+          LOGS_URL: ${{ inputs.run_url }}
         with:
           script: |
-            const prNumbers = JSON.parse('${{ inputs.pr_numbers }}');
+            const prNumbers = JSON.parse(process.env.PR_NUMBERS);
             if (prNumbers.length === 0) {
               console.log('No PRs, skipping');
               return;
             }
 
-            const commitAuthor = '${{ inputs.commit_author }}';
-            const triggeringActor = '${{ inputs.triggering_actor }}';
-            const maxAttempts = ${{ inputs.max_attempts }};
-            const wfName = '${{ inputs.run_name }}';
-            const logsUrl = '${{ inputs.run_url }}';
+            const commitAuthor = process.env.COMMIT_AUTHOR;
+            const triggeringActor = process.env.TRIGGERING_ACTOR;
+            const maxAttempts = parseInt(process.env.MAX_ATTEMPTS, 10);
+            const wfName = process.env.WF_NAME;
+            const logsUrl = process.env.LOGS_URL;
 
             // Loop guard
             if (commitAuthor.includes('claude')) {

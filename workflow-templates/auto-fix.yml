@@ -1,18 +1,28 @@
 # Auto-fix: @claude on CI failure.
 # Copy this file to .github/workflows/auto-fix.yml in your repo.
+# Update the "workflows:" list to match your repo's workflow names.
 
 name: Auto Fix
 
 on:
   workflow_run:
+    workflows: ["PR Validation"]  # <-- UPDATE: list your CI workflow names here
     types: [completed]
+
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   auto-fix:
     if: >-
-      github.event.workflow_run.conclusion == 'failure' ||
-      github.event.workflow_run.conclusion == 'timed_out'
+      (github.event.workflow_run.conclusion == 'failure' ||
+       github.event.workflow_run.conclusion == 'timed_out') &&
+      github.event.workflow_run.pull_requests[0]
     uses: retaintive/.github/.github/workflows/auto-fix.yml@main
+    permissions:
+      issues: write
+      pull-requests: write
     with:
       run_name: ${{ github.event.workflow_run.name }}
       run_url: ${{ github.event.workflow_run.html_url }}
