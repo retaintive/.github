@@ -1,0 +1,104 @@
+# Reusable workflow: post @claude comment on PRs with CI failures.
+#
+# Caller repos add a 10-line workflow file that triggers this on workflow_run.
+# See workflow-templates/auto-fix-caller.yml for the copy-paste template.
+#
+# Loop prevention:
+# - Skip if commit author or triggering_actor contains "claude"
+# - Skip if @claude comment already exists (configurable max_attempts)
+
+name: Auto Fix
+
+on:
+  workflow_call:
+    inputs:
+      run_name:
+        description: "Name of the failed workflow"
+        type: string
+        required: true
+      run_url:
+        description: "URL to the failed workflow run"
+        type: string
+        required: true
+      run_conclusion:
+        description: "Conclusion of the workflow run (failure/timed_out)"
+        type: string
+        required: true
+      pr_numbers:
+        description: "JSON array of PR numbers associated with the run"
+        type: string
+        required: true
+      commit_author:
+        description: "Name of the head commit author"
+        type: string
+        default: ""
+      triggering_actor:
+        description: "Login of the triggering actor"
+        type: string
+        default: ""
+      max_attempts:
+        description: "Max @claude comments per PR before giving up"
+        type: number
+        default: 1
+
+jobs:
+  post-claude-comment:
+    if: inputs.run_conclusion == 'failure' || inputs.run_conclusion == 'timed_out'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumbers = JSON.parse('${{ inputs.pr_numbers }}');
+            if (prNumbers.length === 0) {
+              console.log('No PRs, skipping');
+              return;
+            }
+
+            const commitAuthor = '${{ inputs.commit_author }}';
+            const triggeringActor = '${{ inputs.triggering_actor }}';
+            const maxAttempts = ${{ inputs.max_attempts }};
+            const wfName = '${{ inputs.run_name }}';
+            const logsUrl = '${{ inputs.run_url }}';
+
+            // Loop guard
+            if (commitAuthor.includes('claude')) {
+              console.log('Commit by claude, skipping to prevent loop');
+              return;
+            }
+            if (triggeringActor.includes('claude')) {
+              console.log('Triggered by claude, skipping to prevent loop');
+              return;
+            }
+
+            for (const prNumber of prNumbers) {
+              const { data: comments } = await github.rest.issues.listComments({
+                ...context.repo,
+                issue_number: prNumber,
+                per_page: 10,
+                direction: 'desc',
+              });
+
+              const claudeComments = comments.filter(
+                c => c.body.includes('@claude') && c.user.login !== 'claude[bot]'
+              );
+              if (claudeComments.length >= maxAttempts) {
+                console.log(`PR #${prNumber}: already has @claude comment, skipping`);
+                continue;
+              }
+
+              const body = [
+                `@claude CI workflow **${wfName}** failed on this PR.`,
+                '',
+                `Logs: ${logsUrl}`,
+                '',
+                'Please check the failure and push a fix.',
+              ].join('\n');
+
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: prNumber,
+                body,
+              });
+              console.log(`Posted @claude comment on PR #${prNumber}`);
+            }
