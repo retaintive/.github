@@ -90,18 +90,24 @@ jobs:
             --head "$BRANCH")
 
           echo "Created PR: $PR_URL"
+          PR_NUMBER=$(echo "$PR_URL" | grep -o '[0-9]*$')
 
-          echo "Waiting for CI checks to register..."
-          for i in $(seq 1 12); do
-            if gh pr checks "$PR_URL" 2>&1 | grep -q "pass\|fail\|pending"; then
-              echo "Checks registered after $((i*10))s"
-              break
-            fi
+          echo "Waiting for required checks to pass (up to 5 min)..."
+          for i in $(seq 1 30); do
             sleep 10
+            RESULT=$(gh pr checks "$PR_URL" --required 2>&1) && {
+              echo "All required checks passed after $((i*10))s"
+              echo "Merging..."
+              gh pr merge "$PR_URL" --squash
+              exit 0
+            }
+            if echo "$RESULT" | grep -q "fail"; then
+              echo "Required check failed:"
+              echo "$RESULT"
+              exit 1
+            fi
+            echo "  [$((i*10))s] Still waiting..."
           done
 
-          echo "Waiting for CI checks to pass..."
-          gh pr checks "$PR_URL" --watch
-
-          echo "CI passed, merging..."
-          gh pr merge "$PR_URL" --squash
+          echo "Timed out waiting for checks (5 min). Enabling auto-merge as fallback."
+          gh pr merge "$PR_URL" --auto --squash
