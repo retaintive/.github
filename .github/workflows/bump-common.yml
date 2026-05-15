@@ -91,20 +91,20 @@ jobs:
 
           echo "Created PR: $PR_URL"
 
-          echo "Waiting for checks to register..."
-          for i in $(seq 1 12); do
-            if gh pr checks "$PR_URL" --required 2>&1 | grep -qE "pass|fail|pending"; then
-              echo "Checks registered after $((i*10))s"
-              break
+          echo "Waiting for CI to complete (polling every 30s, up to 10 min)..."
+          for i in $(seq 1 20); do
+            sleep 30
+            MERGEABLE=$(gh pr view "$PR_URL" --json mergeable,mergeStateStatus --jq '.mergeStateStatus')
+            echo "  [$((i*30))s] mergeStateStatus=$MERGEABLE"
+            if [ "$MERGEABLE" = "CLEAN" ]; then
+              echo "PR is clean. Merging..."
+              gh pr merge "$PR_URL" --squash
+              exit 0
+            elif [ "$MERGEABLE" = "BLOCKED" ]; then
+              echo "PR is blocked (CI failed or review required). Skipping merge."
+              exit 1
             fi
-            sleep 10
           done
 
-          echo "Watching required checks..."
-          gh pr checks "$PR_URL" --watch --required && {
-            echo "All required checks passed. Merging..."
-            gh pr merge "$PR_URL" --squash
-          } || {
-            echo "Required checks failed or not found. PR left open."
-            exit 1
-          }
+          echo "Timed out (10 min). PR left open for manual merge."
+          exit 1
