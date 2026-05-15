@@ -73,9 +73,11 @@ jobs:
           git config user.name "retaintive-schema-broadcaster[bot]"
           git config user.email "retaintive-schema-broadcaster[bot]@users.noreply.github.com"
 
+          export HUSKY=0
+
           git checkout -b "$BRANCH"
           git add package.json bun.lock
-          HUSKY=0 git commit -m "chore(deps): bump @retaintive/common to ${VERSION}"
+          git commit -m "chore(deps): bump @retaintive/common to ${VERSION}"
           git push -u origin "$BRANCH"
 
           PR_URL=$(gh pr create \
