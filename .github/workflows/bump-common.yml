@@ -90,4 +90,9 @@ jobs:
             --head "$BRANCH")
 
           echo "Created PR: $PR_URL"
-          gh pr merge "$PR_URL" --auto --squash
+
+          echo "Waiting for CI checks to pass..."
+          gh pr checks "$PR_URL" --watch --fail-fast
+
+          echo "CI passed, merging..."
+          gh pr merge "$PR_URL" --squash
