@@ -92,10 +92,16 @@ jobs:
           echo "Created PR: $PR_URL"
 
           echo "Waiting for CI checks to register..."
-          sleep 30
+          for i in $(seq 1 12); do
+            if gh pr checks "$PR_URL" 2>&1 | grep -q "pass\|fail\|pending"; then
+              echo "Checks registered after $((i*10))s"
+              break
+            fi
+            sleep 10
+          done
 
           echo "Waiting for CI checks to pass..."
-          gh pr checks "$PR_URL" --watch --fail-fast
+          gh pr checks "$PR_URL" --watch
 
           echo "CI passed, merging..."
           gh pr merge "$PR_URL" --squash
