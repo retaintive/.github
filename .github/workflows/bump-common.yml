@@ -1,0 +1,90 @@
+# Reusable workflow: bump @retaintive/common to latest version.
+#
+# Called by downstream repos via repository_dispatch from callytics-common publish.yml.
+# Creates a PR with the version bump, enables auto-merge (squash).
+#
+# Requirements for calling repo:
+# - Secrets: SCHEMA_BROADCAST_APP_ID, SCHEMA_BROADCAST_APP_PRIVATE_KEY
+# - Branch protection: retaintive-schema-broadcaster app in bypass list
+# - bun.lock + package.json tracked in git
+
+name: Bump @retaintive/common
+
+on:
+  workflow_call:
+    secrets:
+      SCHEMA_BROADCAST_APP_ID:
+        required: true
+      SCHEMA_BROADCAST_APP_PRIVATE_KEY:
+        required: true
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  bump:
+    name: Bump @retaintive/common
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.SCHEMA_BROADCAST_APP_ID }}
+          private-key: ${{ secrets.SCHEMA_BROADCAST_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: '.bun-version'
+
+      - name: Update @retaintive/common
+        run: |
+          bun update @retaintive/common
+          echo "VERSION=$(node -p "require('./package.json').dependencies['@retaintive/common'].replace('^','')")" >> "$GITHUB_ENV"
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet package.json bun.lock; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Already on latest version ($VERSION), nothing to do."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Updated to $VERSION"
+          fi
+
+      - name: Create PR and enable auto-merge
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          BRANCH="chore/bump-common-${VERSION}-${TIMESTAMP}"
+
+          git config user.name "retaintive-schema-broadcaster[bot]"
+          git config user.email "retaintive-schema-broadcaster[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add package.json bun.lock
+          HUSKY=0 git commit -m "chore(deps): bump @retaintive/common to ${VERSION}"
+          git push -u origin "$BRANCH"
+
+          PR_URL=$(gh pr create \
+            --title "chore(deps): bump @retaintive/common to ${VERSION}" \
+            --body "Automated bump triggered by a new release of \`@retaintive/common\`.
+
+          Triggered via \`repository_dispatch\` from callytics-common publish workflow.
+          Timestamp: ${TIMESTAMP}" \
+            --label "dependencies" \
+            --head "$BRANCH")
+
+          echo "Created PR: $PR_URL"
+          gh pr merge "$PR_URL" --auto --squash
