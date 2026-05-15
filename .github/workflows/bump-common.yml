@@ -91,6 +91,9 @@ jobs:
 
           echo "Created PR: $PR_URL"
 
+          echo "Waiting for CI checks to register..."
+          sleep 30
+
           echo "Waiting for CI checks to pass..."
           gh pr checks "$PR_URL" --watch --fail-fast
 
