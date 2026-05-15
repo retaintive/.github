@@ -24,6 +24,7 @@ permissions:
 
 env:
   NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   bump:
