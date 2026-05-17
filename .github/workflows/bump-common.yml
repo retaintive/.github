@@ -107,8 +107,8 @@ jobs:
             exit 1
           fi
 
-          echo "All checks completed. Attempting merge (app token has bypass)..."
-          gh pr merge "$PR_URL" --squash || {
-            echo "Merge failed — CI likely has failures. PR left open."
+          echo "All checks completed. Merging with admin bypass..."
+          gh pr merge "$PR_URL" --squash --admin || {
+            echo "Merge failed. PR left open."
             exit 1
           }
