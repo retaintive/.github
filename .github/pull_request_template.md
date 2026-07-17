@@ -148,7 +148,12 @@ CONDITIONAL MODULE — Infrastructure / CDK / Lambda / deployment
 
 说明：
 - 影响范围（affected stacks / functions / workflows / environments）
-- 实际验证（validation）与部署顺序（deployment order）
+- 受影响 component、service 或 Lambda 的 tests
+- Format、lint、type-check 和 build validation
+- Infrastructure-as-code synth / diff 与 policy / security checks
+- 新增 metrics、logs、traces 或 structured fields 的 naming convention
+- 需要同步的 CHANGELOG、runbook 或其他 documentation
+- 部署与迁移顺序（deployment / migration order）
 - 配置、密钥、IAM 和资源替换（config / secret / IAM / resource replacement）
 - 可观测性（observability）与回滚路径（rollback path）
 -->
