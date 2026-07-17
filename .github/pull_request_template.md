@@ -68,10 +68,10 @@ Retaintive organization-wide PR contract
 - 无 runtime 影响时明确写明
 -->
 
-- **Risk：**
-- **Rollout / deployment order：**
-- **Monitoring：**
-- **Rollback：**
+- **风险（Risk）：**
+- **部署与发布顺序（Rollout / Deployment order）：**
+- **监控与观察（Monitoring）：**
+- **回滚方案（Rollback）：**
 
 ## Reviewer guide
 
@@ -131,7 +131,13 @@ CONDITIONAL MODULE — Database / schema / data migration
 
 ## Migration / Data safety
 
-说明 expand / backfill / cutover / contract 顺序、compatibility window、existing data validation、locking / downtime、migration dry-run、rollback 风险和 irreversible boundary。
+说明：
+- 迁移顺序（expand / backfill / cutover / contract）
+- 兼容性窗口（compatibility window）
+- 存量数据验证（existing data validation）
+- 锁表与停机时间（locking / downtime）
+- 迁移演练（migration dry-run）
+- 回滚风险与不可逆边界（rollback risk / irreversible boundary）
 -->
 
 <!--
@@ -140,7 +146,11 @@ CONDITIONAL MODULE — Infrastructure / CDK / Lambda / deployment
 
 ## Deployment / Infrastructure
 
-说明 affected stacks / functions / workflows / environments、实际 validation、deployment order、config / secret / IAM / resource replacement、observability 和 rollback path。
+说明：
+- 影响范围（affected stacks / functions / workflows / environments）
+- 实际验证（validation）与部署顺序（deployment order）
+- 配置、密钥、IAM 和资源替换（config / secret / IAM / resource replacement）
+- 可观测性（observability）与回滚路径（rollback path）
 -->
 
 <!--
@@ -149,7 +159,12 @@ CONDITIONAL MODULE — Security / authorization / sensitive data
 
 ## Security / Tenant isolation
 
-说明 authentication / authorization boundary、tenant / store / account isolation、sensitive data handling、least privilege、fail-open / fail-closed behavior 和 security regression tests。
+说明：
+- 认证与授权边界（authentication / authorization boundary）
+- 租户、店铺与账户隔离（tenant / store / account isolation）
+- 敏感数据处理（sensitive data handling）与最小特权原则（least privilege）
+- 故障处理边界（fail-open / fail-closed behavior）
+- 安全回归测试（security regression tests）
 -->
 
 <!--
@@ -158,7 +173,11 @@ CONDITIONAL MODULE — Observability
 
 ## Observability
 
-说明 logs、metrics、traces、alarms、success / failure signal、rollout 后的判断方式、alert owner 和 troubleshooting entry point。
+说明：
+- 日志、指标、追踪与告警（logs / metrics / traces / alarms）
+- 成功与失败信号（success / failure signal）
+- 发布后的观测与判断方式
+- 告警负责人（alert owner）与排障入口（troubleshooting entry point）
 -->
 
 <!--
@@ -167,5 +186,9 @@ Review comments 导致实质修改时启用。
 
 ## Review updates
 
-说明修复了什么 finding、实现如何变化、新增或重跑了哪些 validation，以及 defer 项目的 follow-up 和风险边界。
+说明：
+- 修复了什么 review finding
+- 具体实现如何变化
+- 新增或重跑了哪些 validation
+- 遗留或推迟项目的 follow-up 与风险边界
 -->
