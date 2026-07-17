@@ -1,0 +1,19 @@
+.github/pull_request_template.md
+  s_8480b52fcc0430::t_1ce09ab303402b 151-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "965636b805c4e5217972386c1ef285f1d4c895e8",
+  "prompts": {},
+  "sessions": {
+    "s_8480b52fcc0430": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f70a1-0f18-7170-95ea-91fc984f8108",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "maxwangsongyuan <songyuanwangcode@gmail.com>"
+    }
+  }
+}
