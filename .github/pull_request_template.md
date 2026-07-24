@@ -100,16 +100,42 @@ CONDITIONAL MODULE — Bug / regression / incident
 CONDITIONAL MODULE — Observable behavior change
 存在明显行为、流程、输出或 contract 变化时启用。
 
+离散的 N 条差异用表格；如果改动是**数据流 / 控制流 / 结构**的变化（例如写入路径、批处理边界、状态流转），优先补一张改前/改后并排对比图，让 reviewer 一眼看出结构差别，而不是逐条读表。图和表可以互补。
+
 ## 改前 vs 改后
 
 | 设计面 / 行为 | 改前 | 改后 |
 | --- | --- | --- |
 | `<surface>` | `<old behavior>` | `<new behavior>` |
+
+改前/改后结构对比图（结构变化时使用；用 Mermaid `flowchart` + `subgraph` 并排）。
+下面用 → 表示连线只是为了不在 HTML 注释里提前闭合；实际写图时把 → 换成 Mermaid 边语法。
+
+  flowchart TB
+    subgraph BEFORE["改前"]
+      输入 → 旧路径 → 结果
+    end
+    subgraph AFTER["改后"]
+      输入 → 新路径 → 结果
+    end
 -->
 
 <!--
 CONDITIONAL MODULE — Architecture / cross-component flow
 跨 service、API、queue、database 或系统边界时启用。
+
+先想「这张图要回答什么问题」，再选图型 —— 不要默认只画一种流程图。选择速查：
+
+| 图型 | 回答什么问题 | 何时用 |
+| --- | --- | --- |
+| ASCII 线框图 | 「长什么样」——静态空间布局 | UI / 界面草图 / 版面结构 |
+| 流程图 / 决策树（flowchart） | 「满足什么条件走哪条路」——分支判定 | 判定逻辑、fate/outcome 分类、条件路由 |
+| 时序图（sequenceDiagram） | 「谁先谁后、谁调谁」——参与者 × 时间 | 跨 service/组件调用顺序、请求链路、握手 |
+| 状态图（stateDiagram） | 「一个东西的状态怎么切换」 | 有限状态机、生命周期（open→closed→reopen） |
+| 实体关系图（erDiagram / ERD） | 「表之间什么关系」 | schema / 表关联 / 外键 |
+| 甘特图（gantt） | 「排期时间线」 | 分阶段 rollout、里程碑 |
+
+一张 PR 常见是「一张全景图标出改动位置 + 按需一张近景（决策树或时序）」。用足以说明改动的最小图集，不为凑数硬画。
 
 ## Architecture / Data flow
 
