@@ -108,17 +108,16 @@ CONDITIONAL MODULE — Observable behavior change
 | --- | --- | --- |
 | `<surface>` | `<old behavior>` | `<new behavior>` |
 
-改前/改后结构对比图（结构变化时使用；用 subgraph 并排）：
+改前/改后结构对比图（结构变化时使用；用 Mermaid `flowchart` + `subgraph` 并排）。
+下面用 → 表示连线只是为了不在 HTML 注释里提前闭合；实际写图时把 → 换成 Mermaid 边语法。
 
-```mermaid
-flowchart TB
-  subgraph BEFORE["改前"]
-    A1[输入] --> A2[旧路径] --> A3[结果]
-  end
-  subgraph AFTER["改后"]
-    B1[输入] --> B2[新路径] --> B3[结果]
-  end
-```
+  flowchart TB
+    subgraph BEFORE["改前"]
+      输入 → 旧路径 → 结果
+    end
+    subgraph AFTER["改后"]
+      输入 → 新路径 → 结果
+    end
 -->
 
 <!--
