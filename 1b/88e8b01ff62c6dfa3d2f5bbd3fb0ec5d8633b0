@@ -1,0 +1,19 @@
+.github/pull_request_template.md
+  s_11f8142e88b5d4::t_79e45ed6105a91 111-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "1b88e8b01ff62c6dfa3d2f5bbd3fb0ec5d8633b0",
+  "prompts": {},
+  "sessions": {
+    "s_11f8142e88b5d4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96295a9e-4bae-41ce-be07-652c39d37c46",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "maxwangsongyuan <songyuanwangcode@gmail.com>"
+    }
+  }
+}
