@@ -6,7 +6,7 @@ Retaintive organization-wide PR contract
 写作规则：
 - PR description 是 reviewer briefing，不是逐文件 diff。
 - 内容长度和结构服从改动复杂度；写到 reviewer 能做出判断为止。
-- Core sections 必须完成；不适用时说明原因。
+- Core sections 必须完成；不适用时说明原因。`Related issues` 有关联时保留，没有时删除。
 - Conditional modules 只在相关时启用，不要保留空 section。
 - Review 导致实现发生实质变化后，更新 PR body，不只依赖 commit history。
 -->
@@ -30,7 +30,18 @@ Retaintive organization-wide PR contract
 说明问题、需求或设计背景：
 - 之前哪里坏了、缺了什么
 - 为什么现在需要修改
-- 关联 Issue、incident、spec 或上游 PR
+- 可引用相关 incident、spec 或上游 PR；GitHub Issue / PR linkage 放在下方 `Related issues`
+-->
+
+## Related issues
+
+<!--
+有相关 GitHub Issue / PR 时保留；没有可删除本 section，不要为了填模板制造关联。
+- 本 PR 完整解决某个 Issue：使用 `Closes #<issue-number>`、`Fixes #<issue-number>` 或 `Resolves #<issue-number>`。
+- 只是相关背景、分批交付或仍有后续工作：使用 `Related to #<issue-number>`、`Refs #<issue-number>` 或普通链接，并说明剩余 scope。
+- 跨 repository 关闭：使用 `Closes <owner>/<repository>#<issue-number>`。
+
+GitHub closing keyword 按语法识别；不打算关闭时不要写“不 close #<issue-number>”或“won't fix #<issue-number>”，改用 non-closing reference。
 -->
 
 ## 改了什么
