@@ -1,0 +1,19 @@
+renovate-config.json
+  s_cf32b887b538c0::t_88149491658ab1 1-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "40b675571574beea895eca667b638abcfb99eee6",
+  "prompts": {},
+  "sessions": {
+    "s_cf32b887b538c0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb8b241b-27b2-4c1a-af82-306d37613ea1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "maxwangsongyuan <songyuanwangcode@gmail.com>"
+    }
+  }
+}
