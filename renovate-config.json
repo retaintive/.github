@@ -1,0 +1,70 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Retaintive shared Renovate defaults. Repos use it with \"extends\": [\"local>retaintive/.github:renovate-config\"] and keep only repo-specific rules.",
+    "One weekly batch PR for all minor/patch updates, automerged once every required check is green; majors stay separate and manual; lock files are refreshed weekly; security fixes open immediately.",
+    "Automerge relies on the repository having required status checks (rulesets). Do not extend this preset from a repo without them.",
+    "platformAutomerge is off: Renovate merges through the REST API so every merge is evaluated by the repository rulesets (required checks always enforced, review bypass honoured). GitHub-native auto-merge ignores ruleset bypass actors and on 2026-09-29 merged three Renovate PRs in callytics-infrastructure without running the CI gate."
+  ],
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    "group:allNonMajor"
+  ],
+  "timezone": "America/Los_Angeles",
+  "schedule": [
+    "* * * * 1-2"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "minimumReleaseAge": "3 days",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "platformAutomerge": false,
+  "packageRules": [
+    {
+      "description": "Weekly non-major batch (group:allNonMajor) and pin/digest updates: automerge when all required checks pass.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "pinDigest",
+        "digest"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "0.x minor releases can break (semver treats 0.y as unstable): keep them in their own group and never automerge, like majors.",
+      "matchCurrentVersion": "<1.0.0",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "groupName": "0.x minor updates",
+      "groupSlug": "zero-x-minor",
+      "automerge": false
+    },
+    {
+      "description": "Pin updates keep the version already in use and carry no release timestamp; under the default minimumReleaseAgeBehaviour (timestamp-required) renovate/stability-days would stay pending forever. Real version bumps keep the 3-day wait.",
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest"
+      ],
+      "minimumReleaseAge": "0 days"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "* * * * 1-2"
+    ],
+    "automerge": true
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "dependencies",
+      "security"
+    ]
+  }
+}
